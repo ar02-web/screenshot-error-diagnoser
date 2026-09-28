@@ -1,0 +1,12 @@
+[
+    {"error": "ECONNREFUSED", "fix": "The service you're connecting to is not running. Start it with `npm start` or `docker-compose up`."},
+    {"error": "ModuleNotFoundError", "fix": "Missing Python package. Run `pip install <package-name>`. Check requirements.txt."},
+    {"error": "Cannot read properties of undefined", "fix": "JavaScript null reference. Add a null check: `if (obj && obj.prop)` before accessing."},
+    {"error": "CORS policy", "fix": "Cross-origin request blocked. Add CORS headers on your server or use a proxy in development."},
+    {"error": "ORA-01017", "fix": "Oracle DB invalid credentials. Check username/password in your connection string."},
+    {"error": "SSL certificate", "fix": "SSL verification failed. Check certificate expiry. Use `--insecure` only in dev, not production."},
+    {"error": "Out of memory", "fix": "Increase heap size: `node --max-old-space-size=4096` or add more RAM to the container."},
+    {"error": "permission denied", "fix": "File permissions issue. Run `chmod +x <file>` or check if you need sudo."},
+    {"error": "port already in use", "fix": "Another process is using this port. Find it with `lsof -i :<port>` and kill it."},
+    {"error": "404 Not Found", "fix": "Endpoint doesn't exist. Check the URL, method (GET/POST), and API version."}
+]

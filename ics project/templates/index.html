@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screenshot Error Diagnoser — AI-Powered Debugger</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i data-lucide="shield-alert" class="logo-icon"></i>
+                    <span>ErrorScanner</span>
+                </div>
+                <span class="version-tag">v2.0</span>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <button class="menu-btn active" data-tab="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Diagnose</span>
+                </button>
+                <button class="menu-btn" data-tab="knowledge-base">
+                    <i data-lucide="database"></i>
+                    <span>Knowledge Base</span>
+                </button>
+                <button class="menu-btn" data-tab="history">
+                    <i data-lucide="history"></i>
+                    <span>History</span>
+                </button>
+                <button class="menu-btn" data-tab="settings">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="status-dot online"></span>
+                    <span>OpenRouter Connected</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <h1 id="page-title">Diagnose Error</h1>
+                    <p id="page-subtitle" class="text-secondary">Upload a screenshot of any terminal error, crash, or code exception to diagnose.</p>
+                </div>
+                <div class="active-config-pill">
+                    <i data-lucide="cpu" class="pill-icon"></i>
+                    <span id="active-model-name">GPT-4o</span>
+                </div>
+            </header>
+
+            <!-- TAB 1: DASHBOARD -->
+            <section id="tab-dashboard" class="tab-pane active">
+                <div class="dashboard-grid">
+                    <!-- Left Column: Input / Scanner -->
+                    <div class="grid-col-left">
+                        <div class="card dropzone-card">
+                            <div class="card-header">
+                                <h3 class="card-title"><i data-lucide="image"></i> Screenshot Input</h3>
+                                <span class="tip-badge">Supports Ctrl+V Paste</span>
+                            </div>
+                            
+                            <div class="upload-dropzone" id="dropzone">
+                                <input type="file" id="file-input" accept="image/*" class="file-input-hidden">
+                                <div class="dropzone-prompt">
+                                    <div class="dropzone-icon-wrapper">
+                                        <i data-lucide="upload-cloud" class="dropzone-icon"></i>
+                                    </div>
+                                    <h4>Drag & drop screenshot here</h4>
+                                    <p class="text-secondary">or click to browse from files, or paste directly with Ctrl+V</p>
+                                    <span class="file-types">Supports PNG, JPG, JPEG, WEBP</span>
+                                </div>
+                                <div class="preview-container" style="display: none;">
+                                    <img id="image-preview" src="" alt="Error Screenshot">
+                                    <div class="scanner-bar" id="scanner-line"></div>
+                                    <button class="remove-image-btn" id="remove-img-btn" title="Remove image">
+                                        <i data-lucide="x"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="action-bar">
+                                <button class="btn btn-primary btn-full" id="diagnose-btn" disabled>
+                                    <i data-lucide="sparkles"></i>
+                                    <span>Diagnose Error</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Demo Presets -->
+                        <div class="card mt-20">
+                            <div class="card-header">
+                                <h3 class="card-title"><i data-lucide="flame"></i> Try with Demo Presets</h3>
+                            </div>
+                            <div class="demo-grid">
+                                <div class="demo-card" data-error-type="econnrefused">
+                                    <div class="demo-icon"><i data-lucide="wifi-off"></i></div>
+                                    <div class="demo-info">
+                                        <span class="demo-title">ECONNREFUSED</span>
+                                        <span class="demo-desc">Local connection failure</span>
+                                    </div>
+                                </div>
+                                <div class="demo-card" data-error-type="modulenotfound">
+                                    <div class="demo-icon"><i data-lucide="package-x"></i></div>
+                                    <div class="demo-info">
+                                        <span class="demo-title">ModuleNotFound</span>
+                                        <span class="demo-desc">Python import exception</span>
+                                    </div>
+                                </div>
+                                <div class="demo-card" data-error-type="cors">
+                                    <div class="demo-icon"><i data-lucide="globe"></i></div>
+                                    <div class="demo-info">
+                                        <span class="demo-title">CORS Blocked</span>
+                                        <span class="demo-desc">Cross-Origin restriction</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Results & Progress -->
+                    <div class="grid-col-right">
+                        <!-- Progress Pipeline Card -->
+                        <div class="card pipeline-card" id="pipeline-card" style="display: none;">
+                            <div class="card-header">
+                                <h3 class="card-title"><i data-lucide="activity"></i> Analysis Pipeline</h3>
+                            </div>
+                            <div class="pipeline-steps">
+                                <div class="pipeline-step" id="step-upload">
+                                    <div class="step-bullet"><i data-lucide="check"></i></div>
+                                    <div class="step-details">
+                                        <div class="step-title">Screenshot uploaded</div>
+                                        <div class="step-desc">Successfully read image binary</div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" id="step-ocr">
+                                    <div class="step-bullet"><span>2</span></div>
+                                    <div class="step-details">
+                                        <div class="step-title">OCR Text Extraction</div>
+                                        <div class="step-desc">Running Vision LLM to parse text</div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" id="step-rag">
+                                    <div class="step-bullet"><span>3</span></div>
+                                    <div class="step-details">
+                                        <div class="step-title">Knowledge Base Lookup (RAG)</div>
+                                        <div class="step-desc">Matching error keywords with catalog</div>
+                                    </div>
+                                </div>
+                                <div class="pipeline-step" id="step-llm">
+                                    <div class="step-bullet"><span>4</span></div>
+                                    <div class="step-details">
+                                        <div class="step-title">Fix Generation</div>
+                                        <div class="step-desc">Synthesizing step-by-step remedy instructions</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Results Container Card -->
+                        <div class="card result-card" id="result-card" style="display: none;">
+                            <div class="card-header">
+                                <h3 class="card-title text-success"><i data-lucide="check-circle-2"></i> Diagnosis Completed</h3>
+                                <div class="card-actions">
+                                    <button class="btn btn-secondary btn-icon" id="copy-btn" title="Copy Fix Steps">
+                                        <i data-lucide="copy"></i>
+                                    </button>
+                                    <button class="btn btn-secondary btn-icon" id="download-btn" title="Save Report">
+                                        <i data-lucide="download"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="result-section">
+                                <h4 class="section-label">Identified Error Text</h4>
+                                <div class="error-text-container">
+                                    <code id="extracted-error-text">No error detected yet.</code>
+                                </div>
+                            </div>
+
+                            <div class="result-section">
+                                <div class="section-label-row">
+                                    <h4 class="section-label">Actionable Fix Steps</h4>
+                                    <span class="rag-badge" id="rag-badge">RAG Matches: 0</span>
+                                </div>
+                                <div class="solution-container" id="solution-container">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Idle state card -->
+                        <div class="card idle-state-card" id="idle-card">
+                            <div class="idle-content">
+                                <i data-lucide="file-question" class="idle-icon"></i>
+                                <h3>Waiting for Input</h3>
+                                <p class="text-secondary">Upload a screenshot, paste from clipboard, or click a demo preset to begin analysis.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: KNOWLEDGE BASE -->
+            <section id="tab-knowledge-base" class="tab-pane">
+                <div class="card">
+                    <div class="kb-header-row">
+                        <div class="kb-search-container">
+                            <i data-lucide="search" class="search-icon"></i>
+                            <input type="text" id="kb-search" placeholder="Search knowledge base entries...">
+                        </div>
+                        <button class="btn btn-primary" id="open-add-kb-btn">
+                            <i data-lucide="plus"></i>
+                            <span>Add Entry</span>
+                        </button>
+                    </div>
+
+                    <!-- Entries List -->
+                    <div class="kb-table-container">
+                        <table class="kb-table">
+                            <thead>
+                                <tr>
+                                    <th width="30%">Error Pattern</th>
+                                    <th width="55%">Recommended Solution</th>
+                                    <th width="15%" class="text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kb-entries-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Add Entry Modal -->
+                <div class="modal-backdrop" id="kb-modal" style="display: none;">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3>Add Knowledge Base Entry</h3>
+                            <button class="modal-close-btn" id="close-kb-modal"><i data-lucide="x"></i></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="modal-error-pattern">Error Pattern / Keyword</label>
+                                <input type="text" id="modal-error-pattern" placeholder="e.g. ECONNREFUSED">
+                                <small class="form-help">Matches when this text is identified in the screenshot.</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="modal-error-fix">Recommended Fix</label>
+                                <textarea id="modal-error-fix" rows="4" placeholder="Explain how to resolve this error. Use backticks for commands."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-secondary" id="cancel-kb-modal">Cancel</button>
+                            <button class="btn btn-primary" id="save-kb-entry">Save Entry</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: HISTORY -->
+            <section id="tab-history" class="tab-pane">
+                <div class="card">
+                    <div class="history-header">
+                        <h3>Diagnostic History</h3>
+                        <button class="btn btn-secondary text-danger" id="clear-history-btn">
+                            <i data-lucide="trash-2"></i>
+                            <span>Clear History</span>
+                        </button>
+                    </div>
+                    <div class="history-list" id="history-container">
+                        <!-- Populated dynamically -->
+                        <div class="history-empty">
+                            <i data-lucide="clock-alert"></i>
+                            <p>No historical diagnoses in this session.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: SETTINGS -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="settings-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-lucide="sliders"></i> OpenRouter Configuration</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="settings-api-key">OpenRouter API Key</label>
+                                <div class="input-password-wrapper">
+                                    <input type="password" id="settings-api-key" placeholder="sk-or-v1-...">
+                                    <button class="toggle-password-btn" id="toggle-key-visibility">
+                                        <i data-lucide="eye"></i>
+                                    </button>
+                                </div>
+                                <small class="form-help">Saved locally in your browser's LocalStorage. If left empty, it falls back to the server's `.env` configuration.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings-model">Preferred Model</label>
+                                <select id="settings-model">
+                                    <option value="openai/gpt-4o">GPT-4o (Recommended)</option>
+                                    <option value="openai/gpt-4o-mini">GPT-4o mini</option>
+                                    <option value="google/gemini-3.5-flash">Gemini 3.5 Flash</option>
+                                    <option value="anthropic/claude-sonnet-4">Claude Sonnet 4</option>
+                                    <option value="~anthropic/claude-sonnet-latest">Claude Sonnet Latest</option>
+                                </select>
+                                <small class="form-help">Select the Vision model to run OCR and error diagnostics.</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settings-api-url">API Base URL</label>
+                                <input type="text" id="settings-api-url" value="https://openrouter.ai/api/v1">
+                            </div>
+
+                            <div class="action-bar justify-end mt-20">
+                                <button class="btn btn-primary" id="save-settings-btn">
+                                    <i data-lucide="save"></i>
+                                    <span>Save Configuration</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i data-lucide="info"></i> Project Details</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="info-row">
+                                <span class="info-label">Framework:</span>
+                                <span class="info-value">Flask (Python 3)</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Interface:</span>
+                                <span class="info-value">HTML5 / Vanilla CSS3 / Modern JS</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">RAG Mechanism:</span>
+                                <span class="info-value">Keyword Vector Matcher (RAG)</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">AI Engine:</span>
+                                <span class="info-value">OpenRouter REST Client</span>
+                            </div>
+                            <div class="info-divider"></div>
+                            <p class="text-secondary small">This UI is custom styled for high fidelity, featuring smooth transitions, glassmorphic layout elements, and terminal color aesthetics built for developers.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i data-lucide="info" class="toast-icon"></i>
+        <span class="toast-message">Notification message</span>
+    </div>
+
+    <!-- Inject scripts -->
+    <script src="/static/js/app.js"></script>
+    <script>
+        // Initialize Lucide icons on page load
+        lucide.createIcons();
+    </script>
+</body>
+</html>
