@@ -1,0 +1,1 @@
+# screenshot-error-diagnoser
