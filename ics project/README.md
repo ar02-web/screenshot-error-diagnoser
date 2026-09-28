@@ -1,6 +1,6 @@
-# 06. Screenshot Error Diagnoser
+# Screenshot Error Diagnoser
 
-> Hackathon Submission | Prince Spark Academy / PSVPEC | 2026
+
 
 ## Problem Statement
 Web UI accepts screenshot upload → Vision LLM extracts error text, RAG-matches to knowledge base, replies with numbered fix steps.
@@ -47,6 +47,3 @@ See `docs/` folder for detailed architecture notes.
 - Python 3.11 (or .NET 8 for project 11)
 - Anthropic claude-sonnet-4-20250514
 - AI Pattern: Vision LLM + RAG
-
----
-*Prince Spark Academy / PSVPEC — Vishnu — Hackathon 2026*
